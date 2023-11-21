@@ -1,5 +1,5 @@
 from fastapi import FastAPI, APIRouter
-from controllers import data , register , login
+from api.controllers import data , register , login
 
 app = FastAPI()
 

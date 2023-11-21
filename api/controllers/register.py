@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from models import User
+from api.models import User
 
 router = APIRouter()
 
@@ -14,8 +14,9 @@ def register():
         email="smashyomum@gmail.com",
         password="randomapssword123"
     )
+    User.create()
     return user; 
 
 @router.post("/register")
-def register():
+def register(user: User):
     return "Registered Fine"; 

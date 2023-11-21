@@ -1,6 +1,9 @@
 from pydantic import BaseModel , validator
+from pymongo import MongoClient
 from datetime import date
 
+client = MongoClient("localhost:27017")
+db = client.pixel
 class User(BaseModel):
     first_name: str 
     last_name: str 
@@ -9,8 +12,10 @@ class User(BaseModel):
     date_of_birth: date
     email: str 
     password: str
+    @classmethod
     def create(self):
-        print(self.username + "created")
+        print( "created")
+        db.user.insert_one({'phraze':'jeez'})
     @validator("password")
     def validate_password_length(cls, value):
         if len(value) < 8:
