@@ -1,21 +1,10 @@
 from fastapi import APIRouter
 from api.models import *
 from pymongo import MongoClient
-from pprint import pprint as print
 
 router = APIRouter()
 
 db = MongoClient("localhost:27017").pixel
-
-data = [
-    {
-        'smash':"bros"
-    },
-    {
-        'age':69,
-        'username':"rick"
-    }
-]
 
 @router.get("/data/{table}")
 def register( table:str):
