@@ -7,7 +7,7 @@ router = APIRouter()
 db = MongoClient("localhost:27017").pixel
 
 @router.get("/data/{table}")
-def register( table:str):
+def getData( table:str):
     match table:
         case "user":
             return list(db.user.find({},{"_id":0}))
