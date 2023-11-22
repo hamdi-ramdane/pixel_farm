@@ -5,11 +5,7 @@ from datetime import date
 client = MongoClient("localhost:27017")
 db = client.pixel
 class User(BaseModel):
-    first_name: str 
-    last_name: str 
     username: str 
-    gender: str 
-    date_of_birth: date
     email: str 
     password: str
     @classmethod
