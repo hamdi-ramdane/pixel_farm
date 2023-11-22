@@ -7,4 +7,3 @@ app.include_router(data.router)
 app.include_router(register.router)
 app.include_router(login.router)
 
-

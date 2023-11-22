@@ -2,10 +2,6 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-@router.get("/login")
-def login():
-    return "Logged In fine"
-
 @router.post("/login")
-def login():
+def login(email: str ,password: str):
     return "Logged In fine"

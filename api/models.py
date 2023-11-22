@@ -66,3 +66,6 @@ class UsageStats(BaseModel):
     stats_id: int
     user_id: int
     stats_date: date
+
+class Token(BaseModel):
+    access_token:str
