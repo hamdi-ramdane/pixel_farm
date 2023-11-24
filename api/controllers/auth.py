@@ -1,14 +1,16 @@
 from fastapi import APIRouter
-from passlib.context import CryptContext
-from api.models import User
-from fastapi.security import OAuth2PasswordBearer
 from pymongo import MongoClient
+from passlib.context import CryptContext
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError,jwt
 
+SECRET_KEY = "3f246e879f7ac59d822ff44015105939"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 db = MongoClient("localhost:27017").pixel
-
 hasher = CryptContext(schemes=["bcrypt"],deprecated="auto")
-oauth_2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+auth_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def get_user(username: str):
