@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError,jwt
+from api.models import User
 
 SECRET_KEY = "3f246e879f7ac59d822ff44015105939"
 ALGORITHM = "HS256"
@@ -20,12 +21,13 @@ def get_user(username: str):
 
 router = APIRouter()
 @router.post("/register",tags=["Authentication"])
-def register(username:str , email:str, password:str):
+def register(data : User):
     new_user = {
-        "username":username,
-        "email":email,
-        "password":password
+        "username":data.username,
+        "email":data.email,
+        "password":hasher.hash(data.password)
     }
+    print(new_user["password"])
     db.user.insert_one(new_user)
     return {"status":True,"details":"Registration Successful"}; 
 

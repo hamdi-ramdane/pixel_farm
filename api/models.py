@@ -2,8 +2,8 @@ from pydantic import BaseModel , validator
 from pymongo import MongoClient
 from datetime import date
 
-client = MongoClient("localhost:27017")
-db = client.pixel
+db = MongoClient("localhost:27017").pixel
+
 class User(BaseModel):
     username: str 
     email: str 
