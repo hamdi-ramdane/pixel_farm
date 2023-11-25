@@ -3,7 +3,7 @@ from pymongo import MongoClient
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError,jwt
-from api.models import User
+from api.models import User , Login
 
 SECRET_KEY = "3f246e879f7ac59d822ff44015105939"
 ALGORITHM = "HS256"
@@ -14,10 +14,10 @@ hasher = CryptContext(schemes=["bcrypt"],deprecated="auto")
 auth_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-def get_user(username: str):
-    user_data = db.user.find_one({"username": username})
+def get_user(email: str):
+    user_data = db.user.find_one({"email": email})
     if user_data:
-        return {'username':username , 'password':user_data['password']}
+        return {'email':email, 'password':user_data['password']}
 
 router = APIRouter()
 @router.post("/register",tags=["Authentication"])
@@ -32,9 +32,9 @@ def register(data : User):
     return {"status":True,"details":"Registration Successful"}; 
 
 @router.post("/login",tags=["Authentication"])
-def login(username: str ,password: str):
-    user = get_user(username)
-    if not user or not hasher.verify(password,user["password"]) :
+def login(data:Login):
+    user = get_user(data.email)
+    if not user or not hasher.verify(data.password,user["password"]) :
         return {'status':False,'details':'invalid Credentials'} 
     return {'status':True,'details':'Logged In Successfully'}
 

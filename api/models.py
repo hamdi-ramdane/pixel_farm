@@ -65,3 +65,7 @@ class UsageStats(BaseModel):
 
 class Token(BaseModel):
     access_token:str
+
+class Login(BaseModel):
+    email: str
+    password:str
