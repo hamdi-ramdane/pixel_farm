@@ -3,7 +3,7 @@ from pymongo import MongoClient
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError,jwt
-from api.models import User , Login
+from api.models import RegisterModel , LoginModel, LogoutModel
 
 SECRET_KEY = "3f246e879f7ac59d822ff44015105939"
 ALGORITHM = "HS256"
@@ -19,9 +19,9 @@ def get_user(email: str):
     if user_data:
         return {'email':email, 'password':user_data['password']}
 
-router = APIRouter()
-@router.post("/register",tags=["Authentication"])
-def register(data : User):
+router = APIRouter(prefix="/auth",tags=["Authentication"])
+@router.post("/register")
+def register(data : RegisterModel):
     new_user = {
         "username":data.username,
         "email":data.email,
@@ -31,13 +31,13 @@ def register(data : User):
     db.user.insert_one(new_user)
     return {"status":True,"details":"Registration Successful"}; 
 
-@router.post("/login",tags=["Authentication"])
-def login(data:Login):
+@router.post("/login")
+def login(data:LogoutModel):
     user = get_user(data.email)
     if not user or not hasher.verify(data.password,user["password"]) :
         return {'status':False,'details':'invalid Credentials'} 
     return {'status':True,'details':'Logged In Successfully'}
 
-@router.post("/logout",tags=["Authentication"])
-def logout(token:str="default"):
+@router.post("/logout")
+def logout(data :LogoutModel):
     return {'status':True,'details':'Logged out Successfully'}

@@ -4,19 +4,43 @@ from datetime import date
 
 db = MongoClient("localhost:27017").pixel
 
-class User(BaseModel):
+# Authentication =========================================================
+# ========================================================================
+class RegisterModel(BaseModel):
     username: str 
     email: str 
     password: str
-    @classmethod
-    def create(self):
-        print( "created")
-        db.user.insert_one({'phraze':'jeez'})
+    @validator('username','email')
+    def check_unique(cls,value):
+        return True;
     @validator("password")
     def validate_password_length(cls, value):
         if len(value) < 8:
             raise ValueError("Password must be at least 8 characters long")
         return value
+
+class LoginModel(BaseModel):
+    email:str
+    password:str
+
+class LogoutModel(BaseModel):
+    token:str
+
+# Communication ==========================================================
+# ========================================================================
+class MessageModel(BaseModel):
+    sender_username:str
+    receiver_username:str
+    content:str
+
+class NotifyModel(BaseModel):
+    receiver_username:str
+    content:str
+
+# Admin ==================================================================
+# ========================================================================
+class BanModel(BaseModel):
+    username:str
 
 
 class Patient(BaseModel):

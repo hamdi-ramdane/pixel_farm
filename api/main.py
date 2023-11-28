@@ -1,5 +1,5 @@
 from fastapi import FastAPI, APIRouter
-from api.controllers import data , auth
+from api.controllers import data , auth, coms, admin
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -16,4 +16,6 @@ app.add_middleware(
 
 app.include_router(data.router)
 app.include_router(auth.router)
+app.include_router(coms.router)
+app.include_router(admin.router)
 
