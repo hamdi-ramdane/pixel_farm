@@ -5,3 +5,4 @@ router = APIRouter(prefix="/admin",tags=["Admin"])
 @router.post("/ban")
 def ban(data : BanModel):
     return "Banned"
+    

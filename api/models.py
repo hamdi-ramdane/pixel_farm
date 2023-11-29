@@ -1,20 +1,30 @@
-from pydantic import BaseModel , validator
+from pydantic import BaseModel, constr , validator, EmailStr
 from pymongo import MongoClient
 from datetime import date
-
+from re import match
 db = MongoClient("localhost:27017").pixel
 
 # Authentication =========================================================
 # ========================================================================
 class RegisterModel(BaseModel):
     username: str 
-    email: str 
-    password: str
-    @validator('username','email')
+    email: EmailStr 
+    password: str 
+    user_type: str 
+    @validator('username')
     def check_unique(cls,value):
-        return True;
+        if db.user.find_one({"username":value}):
+            raise ValueError("Username Taken")
+        if not match(r'^[a-z0-9_]+$', value):
+            raise ValueError("Invalid username format. It should contain only letters, numbers, lowercase letters, and underscores.")
+        return value
+    @validator('email')
+    def check_unique(cls,value):
+        if db.user.find_one({"email":value}):
+            raise ValueError("Email Already Used")
+        return value 
     @validator("password")
-    def validate_password_length(cls, value):
+    def check_lenght(cls, value):
         if len(value) < 8:
             raise ValueError("Password must be at least 8 characters long")
         return value
