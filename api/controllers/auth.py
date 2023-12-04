@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Depends
 from pymongo import MongoClient
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
@@ -32,7 +32,7 @@ def regiter(data : RegisterModel):
     }
     db.user.insert_one(new_user)
     token = createToken(data.username)
-    return {"status":True,"details":"Registration Successful","token":token}; 
+    return {"details":"Registration Successful","token":token}; 
 
 @router.post("/login")
 def login(data:LoginModel):
@@ -41,14 +41,14 @@ def login(data:LoginModel):
     print(list(all))
     print(user)
     if not user or not hasher.verify(data.password,user.get("password")) :
-        return {'status':False,'details':'invalid Credentials'} 
+        raise HTTPException(status_code=400,detail='invalid Credentials')
     token = createToken(user.get("username"))
-    return {'status':True,'details':'Logged In Successfully',"token":token}
+    return {'details':'Logged In Successfully',"token":token}
 
 @router.post("/logout")
-def logout(data :LogoutModel):
+def logout(data :LogoutModel = Depends(auth_scheme)):
     result = db.token.delete_one({'token':data.token})
     if result.deleted_count == 0:
-        return {'status':False,'details':'Token Invalid'}
-    return {'status':True,'details':'Logged out Successfully'}
+        raise HTTPException(status_code=400,detail='Token Invalid')
+    return {'details':'Logged out Successfully'}
  

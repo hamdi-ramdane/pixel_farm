@@ -12,19 +12,19 @@ class RegisterModel(BaseModel):
     password: str 
     user_type: str 
     @validator('username')
-    def check_unique(cls,value):
+    def check_unique_username(cls,value):
         if db.user.find_one({"username":value}):
             raise ValueError("Username Taken")
         if not match(r'^[a-z0-9_]+$', value):
             raise ValueError("Invalid username format. It should contain only letters, numbers, lowercase letters, and underscores.")
         return value
     @validator('email')
-    def check_unique(cls,value):
+    def check_unique_email(cls,value):
         if db.user.find_one({"email":value}):
             raise ValueError("Email Already Used")
         return value 
     @validator("password")
-    def check_lenght(cls, value):
+    def check_length_password(cls, value):
         if len(value) < 8:
             raise ValueError("Password must be at least 8 characters long")
         return value
