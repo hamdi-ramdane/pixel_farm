@@ -1,13 +1,16 @@
 from fastapi import APIRouter
-from api.models import *
-from pymongo import MongoClient
+from api.tools import db,authenticate
+from typing import Annotated
 
-router = APIRouter()
+router = APIRouter(prefix="/data",tags=['Data'])
 
-db = MongoClient("localhost:27017").pixel
+@router.get('/pending')
+def get_pending(username : Annotated[dict,authenticate]):
+    result = db.pending.find({'username':username})
+    return result
 
-@router.get("/data/{table}")
-def getData( table:str):
+@router.get("/{table}")
+async def getData( table:str):
     match table:
         case "user":
             return list(db.user.find({},{"_id":0}))

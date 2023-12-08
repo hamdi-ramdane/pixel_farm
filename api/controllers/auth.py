@@ -1,54 +1,55 @@
 from fastapi import APIRouter, HTTPException, Depends
-from pymongo import MongoClient
-from passlib.context import CryptContext
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError,jwt
-from api.models import RegisterModel , LoginModel, LogoutModel
+from api.tools import createToken,hasher,auth_scheme, db
+from api.models import RegisterModel , LoginModel ,User
 from pprint import pprint as print
+from typing import Annotated
 
-db = MongoClient("localhost:27017").pixel
-
-# Token Parameters 
-def createToken(username):
-    SECRET_KEY = "3f246e879f7ac59d822ff44015105939"
-    ALGORITHM = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES = 30
-    token = jwt.encode({"username":username},key=SECRET_KEY,algorithm=ALGORITHM)
-    db.token.insert_one({"token":token , "username":username})
-    return token;
-auth_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-# Password Hasher
-hasher = CryptContext(schemes=["bcrypt"],deprecated="auto")
 
 router = APIRouter(prefix="/auth",tags=["Authentication"])
+
 @router.post("/register")
-def regiter(data : RegisterModel):
+async def regiter(data : RegisterModel):
     new_user = {
         "username":data.username,
         "email":data.email,
-        "password":hasher.hash(data.password),
-        "is_verified":False,
+        "hashed_password":hasher.hash(data.password),
+        "gender":data.gender,
+        "date_of_birth":data.date_of_birth
     }
+    
+    if data.user_type.lower() == 'patient':
+        db.patient.insert_one({'username':data.username})
+        new_user['perms'] = 1
+    else:
+        db.doctor.insert_one({'username':data.username})
+        new_user['perms'] = 5
+
     db.user.insert_one(new_user)
-    token = createToken(data.username)
+    token = createToken(User(
+        username=data.username,
+        email=data.email,perms=new_user['perms']
+        )
+    )
+
     return {"details":"Registration Successful","token":token}; 
 
 @router.post("/login")
-def login(data:LoginModel):
+async def login(data:LoginModel):
     user= db.user.find_one({"email": data.email})
-    all = db.user.find()
-    print(list(all))
-    print(user)
-    if not user or not hasher.verify(data.password,user.get("password")) :
+    if not user or not hasher.verify(data.password,user.get("hashed_password")) :
         raise HTTPException(status_code=400,detail='invalid Credentials')
-    token = createToken(user.get("username"))
+    token = createToken(User(
+        username=user.get('username'),
+        email=user.get('email'),
+        perms=user.get('perms')
+        )
+    )
     return {'details':'Logged In Successfully',"token":token}
 
 @router.post("/logout")
-def logout(data :LogoutModel = Depends(auth_scheme)):
-    result = db.token.delete_one({'token':data.token})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=400,detail='Token Invalid')
+async def logout(token: Annotated[LoginModel,Depends(auth_scheme)]):
+    delete_result = db.token.delete_many({'token':token})
+    if delete_result.deleted_count == 0:
+        raise HTTPException(status_code=401,detail='Invalid Token')
     return {'details':'Logged out Successfully'}
  

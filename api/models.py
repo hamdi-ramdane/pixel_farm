@@ -1,16 +1,24 @@
-from pydantic import BaseModel, constr , validator, EmailStr
+from pydantic import BaseModel , validator, EmailStr
 from pymongo import MongoClient
-from datetime import date
+from datetime import date,datetime
 from re import match
+
 db = MongoClient("localhost:27017").pixel
+
+class User(BaseModel):
+    username: str
+    email: EmailStr 
+    perms:int = 1
 
 # Authentication =========================================================
 # ========================================================================
 class RegisterModel(BaseModel):
-    username: str 
-    email: EmailStr 
-    password: str 
-    user_type: str 
+    username: str
+    email: EmailStr
+    password: str = 'password123' # -----------------------------------------------------------
+    gender: str = "male"
+    date_of_birth: date = date(2005,3,25)
+    user_type: str = 'patient'
     @validator('username')
     def check_unique_username(cls,value):
         if db.user.find_one({"username":value}):
@@ -28,22 +36,37 @@ class RegisterModel(BaseModel):
         if len(value) < 8:
             raise ValueError("Password must be at least 8 characters long")
         return value
+    @validator("user_type")
+    def check_user_type(cls,value):
+        if value.lower() not in ["doctor","patient"]:
+            raise ValueError("Invalid User Type [doctor, patient]")
+        return value
+    @validator("gender")
+    def check_gender(cls,value):
+        if value.lower() not in ["male","female"]:
+            raise ValueError("Invalid Gender [Male, Female]")
+        return value
+    @validator("date_of_birth")
+    def check_date_of_birth(cls,value):
+        age = datetime.now().date().year - value.year
+        if age < 13:
+            raise ValueError("Too Young (must be 13 or above)")
+        elif age > 100 :
+            raise ValueError("Too Old (must be less than a 100 y/o) ")
+        
+        return value
 
 class LoginModel(BaseModel):
     email:str
-    password:str
-
-class LogoutModel(BaseModel):
-    token:str
+    password:str = 'password123' # ------------------------------------------------------------
 
 # Communication ==========================================================
 # ========================================================================
 class MessageModel(BaseModel):
-    sender_username:str
     receiver_username:str
     content:str
 
-class NotifyModel(BaseModel):
+class NotificationModel(BaseModel):
     receiver_username:str
     content:str
 
@@ -52,6 +75,10 @@ class NotifyModel(BaseModel):
 class BanModel(BaseModel):
     username:str
 
+class QuizSubmitModel(BaseModel):
+    token: str
+    quiz_id: int
+    score: int
 
 class Patient(BaseModel):
     user_id: int

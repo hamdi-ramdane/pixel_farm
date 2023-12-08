@@ -1,12 +1,15 @@
 from fastapi import APIRouter, Depends
-from fastapi.security import OAuth2PasswordBearer
-from api.models import BanModel
+from api.models import BanModel,User
+from api.tools import db, authenticate
+from typing import Annotated
 
-auth_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
-router = APIRouter(prefix="/admin",tags=["Admin"])
+router = APIRouter(prefix="/dashboard",tags=["Dashboard"])
 
 @router.post("/ban")
-def ban(data : BanModel = Depends(auth_scheme)):
+def ban(data : Annotated[BanModel , Depends(authenticate)]):
     return "Banned"
-    
+@router.post('/updateprofile')
+def update_profile(user: Annotated[User,authenticate]):
+    return "updated"
+
