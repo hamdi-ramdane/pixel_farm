@@ -46,3 +46,4 @@ async def notification(user: Annotated[User,Depends(authenticate)],data:Notifica
     return {'detail':"Notification Sent Successfully"};
 
 # 1 1 1 1 1 = super_admin | admin | doctor | verified_byEmail | Activated (not disabled)
+
