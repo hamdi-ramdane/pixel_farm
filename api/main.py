@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from api.controllers import data , auth, coms,quiz, admin
+from api.controllers import auth, coms,quiz, dashboard 
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -17,5 +17,6 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(coms.router)
 app.include_router(quiz.router)
-app.include_router(admin.router)
-app.include_router(data.router)
+app.include_router(dashboard.router)
+
+# 1 1 1 1 1 = super_admin | admin | doctor | verified_byEmail | Activated (not disabled)

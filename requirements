@@ -1,7 +1,8 @@
 
 pymongo
-fastapi
+fastapi[all]
 uvicorn
+python-jose
 passlib[bcrypt]
 pydantic
 pydantic[email]
