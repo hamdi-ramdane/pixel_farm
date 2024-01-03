@@ -31,7 +31,7 @@ async def regiter(data : RegisterModel):
         )
     )
 
-    return {"details":"Registration Successful","token":token}; 
+    return {"details":"Registration Successful","token":token,"user_type":data.user_type.lower()}; 
 
 @router.post("/login")
 async def login(data:LoginModel):
@@ -44,7 +44,13 @@ async def login(data:LoginModel):
         perms=user.get('perms')
         )
     )
-    return {'details':'Logged In Successfully',"token":token}
+    perms = user.get('perms')
+    if(perms <= 3 ):
+        user_type = 'patient'
+    else:
+        user_type = 'doctor'
+
+    return {'details':'Logged In Successfully',"token":token,"user_type":user_type}
 
 @router.post("/logout")
 async def logout(token: Annotated[LoginModel,Depends(auth_scheme)]):
