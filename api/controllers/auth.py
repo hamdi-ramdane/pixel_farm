@@ -14,7 +14,8 @@ async def regiter(data : RegisterModel):
         "email":data.email,
         "hashed_password":hasher.hash(data.password),
         "gender":data.gender,
-        "date_of_birth":data.date_of_birth.strftime("%Y-%m-%d")
+        "date_of_birth":data.date_of_birth.strftime("%Y-%m-%d"),
+        "full_name":data.full_name
     }
     
     if data.user_type.lower() == 'patient':

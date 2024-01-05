@@ -20,4 +20,5 @@ app.include_router(quiz.router)
 app.include_router(dashboard.router)
 app.include_router(data.router)
 
-# 1 1 1 1 1 = super_admin | admin | doctor | verified_byEmail | Activated (not disabled)
+#  1 1 1 1 1 = super_admin | admin | doctor | verified_byEmail | Activated (not disabled)
+# 16 8 4 2 1

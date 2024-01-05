@@ -14,6 +14,7 @@ class User(BaseModel):
 # ========================================================================
 class RegisterModel(BaseModel):
     username: str
+    full_name: str
     email: EmailStr
     password: str = 'password123' # -----------------------------------------------------------
     gender: str = "male"

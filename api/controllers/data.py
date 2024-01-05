@@ -21,4 +21,27 @@ async def get_user_info(user : Annotated[User,Depends(authenticate)]):
     username = user.username
     user_in_db = db.user.find_one({'username':username},{'_id':0,'hashed_password':0})
     return dict(user_in_db)
+
+@router.get('/user-count')
+async def get_all_users_count():
+    patients = db.user.count_documents({'perms':{'$lt':4}})
+    doctors = db.user.count_documents({'perms':{"$gt":3,"$lt":8}})
+    admins = db.user.count_documents({'perms':{"$gt":8}})
+
+    return {
+        'users':patients+doctors+admins,
+        'patients':patients,
+        'doctors':doctors,
+        'admins':admins,
+    }
+
     
+@router.get('/patients')
+async def get_all_patient_usernames():
+    patients  = list(db.user.find({'perms':{'$lt':4}},{"_id":0,"username":1}))
+    return patients
+
+@router.get('/doctors')
+async def get_all_doctor_usernames():
+    patients  = list(db.user.find({'perms':{'$gt':3,'$lt':8}},{"_id":0,"username":1}))
+    return patients
